@@ -6,7 +6,7 @@ namespace Entradas_Eventos.Data
     public class SeedDb
     {
         private readonly DataContext _context;
-        private readonly int EntrancesNum = 5000;
+        private readonly int EntrancesNum = 50;
 
         public SeedDb(DataContext context)
         {
