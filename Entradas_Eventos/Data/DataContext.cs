@@ -16,8 +16,9 @@ namespace Entradas_Eventos.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Ticket>().HasIndex(c => c.Id).IsUnique();
-            modelBuilder.Entity<Entrance>().HasIndex(c => c.Description).IsUnique();
+            modelBuilder.Entity<Ticket>().HasIndex("Document").IsUnique();
+            modelBuilder.Entity<Entrance>().HasIndex("Description").IsUnique();
+
         }
     }
 }
