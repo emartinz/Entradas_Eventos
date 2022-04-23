@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entradas_Eventos.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220422033825_AddTicketAndEntrance")]
+    [Migration("20220422060753_AddTicketAndEntrance")]
     partial class AddTicketAndEntrance
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
