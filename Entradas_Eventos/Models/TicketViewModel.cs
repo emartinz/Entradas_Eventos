@@ -8,7 +8,7 @@ namespace Entradas_Eventos.Models
     public class TicketViewModel
     {
 
-        public string? Id { get; set; }
+        public int? Id { get; set; }
 
         [Display(Name = "Usada?")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]

@@ -5,7 +5,8 @@ namespace Entradas_Eventos.Helpers.Interfaces
 {
     public interface ITicketsHelper
     {
-        Task<Ticket> GetTicketAsync(TicketViewModel model);
+        Task<Ticket> GetTicketFromModelAsync(TicketViewModel model);
         Task<Entrance> GetTicketEntranceByIdAsync(int id);
+        Task<TicketViewModel> GetModelFromTicketAsync(Ticket ticket);
     }
 }

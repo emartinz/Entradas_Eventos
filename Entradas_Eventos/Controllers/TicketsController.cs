@@ -53,18 +53,25 @@ namespace Entradas_Eventos.Controllers
 
         // GET: Tickets/Create
         [HttpGet]
-        public async Task<IActionResult> CreateAsync()
+        public async Task<IActionResult> AssignTicketAsync()
         {
-            TicketViewModel model = new()
-            {
-                EntrancesList = await _combosHelper.GetComboEntranceAsync()
-            };
+            TicketViewModel model = new();
+
+            var ticket = await _context.Tickets.Include(ticket => ticket.Entrance).Where(p => p.WasUsed.Equals(false)).FirstOrDefaultAsync();
+            if (null != ticket) {
+                model = await _ticketsHelper.GetModelFromTicketAsync(ticket);
+            }
+            else {
+                ModelState.AddModelError(string.Empty, "No hay entradas disponibles.");
+            }
+            model.EntrancesList = await _combosHelper.GetComboEntranceAsync();
             return View(model);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TicketViewModel model)
+        public async Task<IActionResult> AssignTicket(TicketViewModel model)
         {
             model.entrance = await _ticketsHelper.GetTicketEntranceByIdAsync(model.EntranceId);
 
@@ -72,8 +79,8 @@ namespace Entradas_Eventos.Controllers
             {
                 try
                 {
-                    Ticket ticket = await _ticketsHelper.GetTicketAsync(model);
-                    _context.Add(ticket);
+                    Ticket ticket = await _ticketsHelper.GetTicketFromModelAsync(model);
+                    _context.Update(ticket);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
@@ -96,26 +103,19 @@ namespace Entradas_Eventos.Controllers
             return View(model);
         }
 
-        // GET: Tickets/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var ticket = await _context.Tickets.FindAsync(id);
-            if (ticket == null)
-            {
-                return NotFound();
-            }
-            return View(ticket);
+        // GET: Tickets/Edit/5
+        public async Task<IActionResult> Edit(TicketViewModel model)
+        {
+            Entrance entrance = await _ticketsHelper.GetTicketEntranceByIdAsync(model.EntranceId);
+            model.entrance = entrance;
+            return View(model);
         }
 
         // POST: Tickets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,WasUsed,Document,Name,Date")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, Ticket ticket)
         {
             if (id != ticket.Id)
             {

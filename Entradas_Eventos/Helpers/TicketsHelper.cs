@@ -13,10 +13,11 @@ namespace Entradas_Eventos.Helpers
         {
             _context = context;
         }
-        public async Task<Ticket> GetTicketAsync(TicketViewModel model)
+        public async Task<Ticket> GetTicketFromModelAsync(TicketViewModel model)
         {
             Ticket ticket = new()
             {
+                Id = (int)model.Id,
                 WasUsed = model.WasUsed,
                 Name = model.Name,
                 Document = model.Document,
@@ -30,6 +31,23 @@ namespace Entradas_Eventos.Helpers
         public async Task<Entrance> GetTicketEntranceByIdAsync(int id)
         {
             return await _context.Entrances.FindAsync(id);
+        }
+
+        public async Task<TicketViewModel> GetModelFromTicketAsync(Ticket ticket)
+        {
+            TicketViewModel ticketViewModel = new()
+            {
+                Id=ticket.Id,
+                WasUsed = ticket.WasUsed,
+                Document = ticket.Document,
+                Name = ticket.Name,
+                Date = ticket.Date,
+                entrance = ticket.Entrance,
+                EntranceId = ticket.Entrance.Id
+            };
+
+            return ticketViewModel;
+
         }
     }
 }
