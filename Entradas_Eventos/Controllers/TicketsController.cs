@@ -36,28 +36,62 @@ namespace Entradas_Eventos.Controllers
         // GET: Tickets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            TicketViewModel model = new();
+            Ticket ticket = new();
+            if (id != null)
             {
-                return NotFound();
+                ticket = await _context.Tickets.Include(ticket => ticket.Entrance).FirstOrDefaultAsync(m => m.Id == id);
+            }
+            else
+            {
+                ticket = await _context.Tickets.Include(ticket => ticket.Entrance).Where(p => p.WasUsed.Equals(false)).FirstOrDefaultAsync();
             }
 
-            var ticket = await _context.Tickets
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (ticket == null)
+            if (null != ticket)
             {
-                return NotFound();
+                model = await _ticketsHelper.GetModelFromTicketAsync(ticket);
             }
 
-            return View(ticket);
+            return View(model);
         }
 
-        // GET: Tickets/Create
-        [HttpGet]
-        public async Task<IActionResult> AssignTicketAsync()
+        // GET: Tickets/DetailsTicket/5
+        public async Task<IActionResult> DetailsTicket(int? id)
         {
             TicketViewModel model = new();
+            Ticket ticket = new();
+            if (id != null)
+            {
+                ticket = await _context.Tickets.Include(ticket => ticket.Entrance).FirstOrDefaultAsync(m => m.Id == id);
+            }
+            else
+            {
+                ticket = await _context.Tickets.Include(ticket => ticket.Entrance).Where(p => p.WasUsed.Equals(false)).FirstOrDefaultAsync();
+            }
 
-            var ticket = await _context.Tickets.Include(ticket => ticket.Entrance).Where(p => p.WasUsed.Equals(false)).FirstOrDefaultAsync();
+            if (null != ticket)
+            {
+                model = await _ticketsHelper.GetModelFromTicketAsync(ticket);
+            }
+
+            return View(model);
+        }
+
+        // GET: Tickets/AssignTicket
+        [HttpGet]
+        public async Task<IActionResult> AssignTicketAsync(int? id)
+        {
+            TicketViewModel model = new();
+            Ticket ticket = new();
+            if (id != null)
+            {
+                ticket = await _context.Tickets.Include(ticket => ticket.Entrance).FirstOrDefaultAsync(m => m.Id == id);
+            }
+            else
+            {
+                ticket = await _context.Tickets.Include(ticket => ticket.Entrance).Where(p => p.WasUsed.Equals(false)).FirstOrDefaultAsync();
+            }
+            
             if (null != ticket) {
                 model = await _ticketsHelper.GetModelFromTicketAsync(ticket);
             }
@@ -65,9 +99,10 @@ namespace Entradas_Eventos.Controllers
                 ModelState.AddModelError(string.Empty, "No hay entradas disponibles.");
             }
             model.EntrancesList = await _combosHelper.GetComboEntranceAsync();
+            model.WasUsed = true;
+            model.Date = DateTime.Now;
             return View(model);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -103,6 +138,40 @@ namespace Entradas_Eventos.Controllers
             return View(model);
         }
 
+        // GET: Tickets/SeekTicket
+        [HttpGet]
+        public async Task<IActionResult> SeekTicketAsync()
+        {
+            TicketViewModel model = new();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SeekTicketAsync(TicketViewModel model)
+        {
+
+            if (model.Id != null)
+            {
+                var ticket = await _context.Tickets.Include(ticket => ticket.Entrance).FirstOrDefaultAsync(m => m.Id == model.Id);
+                if (ticket == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Esta boleta no existe.");
+                }
+                else if (ticket.WasUsed)
+                {
+                    return RedirectToAction("DetailsTicket", new { id = model.Id });
+                }
+                else
+                {
+                    return RedirectToAction("AssignTicket", new { id = model.Id });
+                }
+            }
+            return View(model);
+        }
+
+
+        
 
         // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(TicketViewModel model)
